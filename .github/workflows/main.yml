@@ -82,7 +82,7 @@ jobs:
           seqtk
           seqkit
           squizz
-          sra-tools
+          sra-tools<3.4
           ucsc-wigtobigwig
           ucsc-twobittofa
           ucsc-fatotwobit
