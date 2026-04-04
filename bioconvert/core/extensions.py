@@ -95,6 +95,8 @@ extensions = {
     "graphml": ["graphml"],  # network
     "gtf": ["gtf"],  # annotation
     "gz": ["gz"],
+    "hic": ["hic"],  # 3D genome Hi-C contact map (Juicer)
+    "cool": ["cool", "mcool"],  # 3D genome Hi-C contact map (Cooler)
     "jaspar": ["jaspar"],  # motif
     "json": ["json"],  # database
     "maf": ["maf"],  # !! this is MIRA format, not mutation alignment format
