@@ -24,3 +24,5 @@ pyBigWig
 py2bit
 statsmodels
 tqdm
+hic2cool
+HiCLift
