@@ -1,0 +1,33 @@
+LOCUS       BQMF01TEST             200 bp    DNA     linear   ENV 01-JAN-2022
+DEFINITION  Test sequence with CDS features but no explicit gene features.
+ACCESSION   BQMF01TEST
+VERSION     BQMF01TEST.1
+KEYWORDS    .
+SOURCE      marine metagenome
+  ORGANISM  marine metagenome
+            unclassified sequences; metagenomes.
+FEATURES             Location/Qualifiers
+     source          1..200
+                     /organism="marine metagenome"
+                     /mol_type="genomic DNA"
+                     /metagenome_source="marine metagenome"
+                     /db_xref="taxon:408172"
+     CDS             1..90
+                     /locus_tag="GENE001"
+                     /product="hypothetical protein A"
+                     /protein_id="AAA00001.1"
+                     /db_xref="GI:000001"
+                     /codon_start=1
+                     /transl_table=11
+     CDS             complement(100..190)
+                     /locus_tag="GENE002"
+                     /product="hypothetical protein B"
+                     /protein_id="AAA00002.1"
+                     /codon_start=1
+                     /transl_table=11
+ORIGIN
+        1 atgaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa
+       61 aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aa
+       91 cccgggcccg ggcccgggcc cgggcccggg cccgggcccg ggcccgggcc cgggcccggg
+      161 cccgggcccg ggcccgggcc cgggcccggg
+//

@@ -32,6 +32,16 @@ from Bio.Seq import UndefinedSequenceError
 from bioconvert.utils.biocode import annotation, things, utils
 
 
+def _get_locus_tag(feat, mol_id, counter):
+    """Return a locus_tag for *feat*, falling back to protein_id, gene qualifier,
+    or a generated identifier when none of the standard qualifiers is present."""
+    for key in ('locus_tag', 'protein_id', 'gene'):
+        if key in feat.qualifiers:
+            return feat.qualifiers[key][0]
+    counter[0] += 1
+    return "{0}_{1}_{2}".format(mol_id, feat.type, counter[0])
+
+
 def gbk2gff3(infile, outfile=None, fasta=False):
 
     ## output will either be a file or STDOUT
@@ -52,6 +62,7 @@ def gbk2gff3(infile, outfile=None, fasta=False):
     seqs_pending_writes = False
 
     features_skipped_count = 0
+    _id_counter = [0]
 
     # each gb_record is a SeqRecord object
     for gb_record in SeqIO.parse(open(infile, "r"), "genbank"):
@@ -92,14 +103,14 @@ def gbk2gff3(infile, outfile=None, fasta=False):
                 if current_gene is not None:
                     gene.print_as(fh=ofh, source='GenBank', format='gff3')
 
-                locus_tag = feat.qualifiers['locus_tag'][0]
+                locus_tag = _get_locus_tag(feat, mol_id, _id_counter)
                 gene = things.Gene(id=locus_tag, locus_tag=locus_tag)
                 gene.locate_on( target=current_assembly, fmin=fmin, fmax=fmax, strand=strand )
                 current_gene = gene
                 current_RNA = None
 
             elif feat.type == 'mRNA':
-                locus_tag = feat.qualifiers['locus_tag'][0]
+                locus_tag = _get_locus_tag(feat, mol_id, _id_counter)
                 rna_count_by_gene[locus_tag] += 1
                 feat_id = "{0}.mRNA.{1}".format( locus_tag, rna_count_by_gene[locus_tag] )
 
@@ -114,7 +125,7 @@ def gbk2gff3(infile, outfile=None, fasta=False):
                     exon_count_by_RNA[feat_id] = 0
 
             elif feat.type == 'tRNA':
-                locus_tag = feat.qualifiers['locus_tag'][0]
+                locus_tag = _get_locus_tag(feat, mol_id, _id_counter)
                 rna_count_by_gene[locus_tag] += 1
                 feat_id = "{0}.tRNA.{1}".format(locus_tag, rna_count_by_gene[locus_tag])
 
@@ -134,7 +145,7 @@ def gbk2gff3(infile, outfile=None, fasta=False):
                     exon_count_by_RNA[feat_id] = 0
 
             elif feat.type == 'rRNA':
-                locus_tag = feat.qualifiers['locus_tag'][0]
+                locus_tag = _get_locus_tag(feat, mol_id, _id_counter)
                 rna_count_by_gene[locus_tag] += 1
                 feat_id = "{0}.rRNA.{1}".format(locus_tag, rna_count_by_gene[locus_tag])
 
@@ -156,7 +167,18 @@ def gbk2gff3(infile, outfile=None, fasta=False):
                     exon_count_by_RNA[feat_id] = 0
 
             elif feat.type == 'CDS':
-                locus_tag = feat.qualifiers['locus_tag'][0]
+                locus_tag = _get_locus_tag(feat, mol_id, _id_counter)
+
+                # If there is no current gene (i.e. the file has CDS features without
+                # explicit gene features), synthesise a gene entry from the CDS location.
+                if current_gene is None or current_gene.locus_tag != locus_tag:
+                    if current_gene is not None:
+                        gene.print_as(fh=ofh, source='GenBank', format='gff3')
+                    gene = things.Gene(id=locus_tag, locus_tag=locus_tag)
+                    gene.locate_on( target=current_assembly, fmin=fmin, fmax=fmax, strand=strand )
+                    current_gene = gene
+                    current_RNA = None
+
                 # If processing a prokaryotic GBK, we'll encounter CDS before mRNA, so we have to
                 #  manually make one
                 if current_RNA is None:
