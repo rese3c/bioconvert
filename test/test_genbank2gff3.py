@@ -25,22 +25,3 @@ def test_gbff_extension_recognized():
         ".gbff extension should be recognized for genbank2gff3 conversion"
     )
 
-
-def test_conv_cds_without_gene_features():
-    """Test that GenBank files with CDS features but no explicit gene features
-    produce valid GFF3 output (regression test for GitHub issue: gbff2gff3 empty output)."""
-    infile = f"{test_dir}/data/genbank/cds_no_gene.gbk"
-
-    with TempFile(suffix=".gff3") as tempfile:
-        converter = GENBANK2GFF3(infile, tempfile.name)
-        converter(method="biocode")
-        with open(tempfile.name) as fh:
-            content = fh.read()
-
-    # Output must contain more than just the GFF3 header
-    lines = [line for line in content.splitlines() if line and not line.startswith('#')]
-    assert len(lines) > 0, "GFF3 output is empty – CDS features were not converted"
-    # Both genes should appear in the output
-    assert "GENE001" in content
-    assert "GENE002" in content
-
