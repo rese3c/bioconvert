@@ -24,6 +24,7 @@ Author: Joshua Orvis (jorvis AT gmail)
 """
 
 import argparse
+import itertools
 import sys
 from collections import defaultdict
 
@@ -32,14 +33,13 @@ from Bio.Seq import UndefinedSequenceError
 from bioconvert.utils.biocode import annotation, things, utils
 
 
-def _get_locus_tag(feat, mol_id, counter):
+def _get_locus_tag(feat, mol_id, id_counter):
     """Return a locus_tag for *feat*, falling back to protein_id, gene qualifier,
     or a generated identifier when none of the standard qualifiers is present."""
     for key in ('locus_tag', 'protein_id', 'gene'):
         if key in feat.qualifiers:
             return feat.qualifiers[key][0]
-    counter[0] += 1
-    return "{0}_{1}_{2}".format(mol_id, feat.type, counter[0])
+    return "{0}_{1}_{2}".format(mol_id, feat.type, next(id_counter))
 
 
 def gbk2gff3(infile, outfile=None, fasta=False):
@@ -62,7 +62,7 @@ def gbk2gff3(infile, outfile=None, fasta=False):
     seqs_pending_writes = False
 
     features_skipped_count = 0
-    _id_counter = [0]
+    _id_counter = itertools.count(1)
 
     # each gb_record is a SeqRecord object
     for gb_record in SeqIO.parse(open(infile, "r"), "genbank"):

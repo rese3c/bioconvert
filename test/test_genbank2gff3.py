@@ -38,7 +38,7 @@ def test_conv_cds_without_gene_features():
             content = fh.read()
 
     # Output must contain more than just the GFF3 header
-    lines = [l for l in content.splitlines() if l and not l.startswith('#')]
+    lines = [line for line in content.splitlines() if line and not line.startswith('#')]
     assert len(lines) > 0, "GFF3 output is empty – CDS features were not converted"
     # Both genes should appear in the output
     assert "GENE001" in content
