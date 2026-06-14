@@ -4,17 +4,7 @@ on:
   workflow_call:
   workflow_dispatch:
   push:
-    branches:
-      - main
-      - dev
-      - refactoring
-    paths:
-      - bioconvert/csv2tsv.py
-      - .github/workflows/csv2tsv.yml
   pull_request:
-    branches-ignore: []
-    paths:
-      - bioconvert/csv2tsv.py
   schedule:
     - cron: '0 0 13 * *'
 
@@ -106,4 +96,4 @@ jobs:
     - name: testing
       shell: bash -l {0}
       run: |
-        pytest -n 1  --cov-report term --cov=bioconvert.csv2tsv test/test_csv2tsv.py
+        pytest -n 1 --cov-report term --cov=bioconvert.csv2tsv test/test_csv2tsv.py
